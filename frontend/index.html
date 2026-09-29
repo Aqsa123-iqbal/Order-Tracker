@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Order Tracker & Live Support</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #eef1f5; --panel: #ffffff; --ink: #1b2430; --muted: #66758a; --line: #dde3ea;
+    --teal: #0f766e; --teal-soft: #d8f0ec; --amber: #b45309; --amber-soft: #fdecc8;
+    --red: #b42318; --red-soft: #fde4e1; --blue: #1d4ed8; --blue-soft: #dbe6fd;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Manrope', system-ui, Segoe UI, Arial, sans-serif; line-height: 1.5; }
+  header { background: var(--ink); color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.3px; }
+  header p { margin: 2px 0 0; color: #9fb0c3; font-size: 14px; }
+  #conn { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 99px; background: #2a3646; font-size: 13px; font-weight: 600; }
+  #conn i { width: 9px; height: 9px; border-radius: 50%; background: #e5484d; }
+  #conn.on i { background: #3ecf8e; }
+
+  main { max-width: 1100px; margin: 22px auto; padding: 0 16px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: start; }
+  .col { display: grid; gap: 20px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+  h2 { margin: 0 0 14px; font-size: 17px; font-weight: 800; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tag { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--bg); border: 1px solid var(--line); padding: 2px 9px; border-radius: 99px; }
+
+  button { font: inherit; font-size: 14px; font-weight: 600; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 7px 13px; border-radius: 8px; cursor: pointer; transition: background .15s, border-color .15s; }
+  button:hover { background: var(--bg); }
+  button.primary { background: var(--teal); border-color: var(--teal); color: #fff; }
+  button.primary:hover { background: #0b5f58; }
+  button.danger { color: var(--red); border-color: #f0c2bd; }
+  button.danger:hover { background: var(--red-soft); }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #7cc4bc; outline-offset: 1px; }
+  input, select { font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+
+  /* Menu */
+  .menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .dish { border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .dish b { font-size: 16px; }
+  .dish span { color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+
+  /* Orders */
+  .order { border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+  .order:last-child { margin-bottom: 0; }
+  .order-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+  .b-Placed { background: var(--blue-soft); color: var(--blue); }
+  .b-Preparing { background: var(--amber-soft); color: var(--amber); }
+  .b-Ontheway { background: var(--amber-soft); color: var(--amber); }
+  .b-Delivered { background: var(--teal-soft); color: var(--teal); }
+  .b-Cancelled { background: var(--red-soft); color: var(--red); }
+  .steps { display: flex; gap: 6px; margin: 12px 0; }
+  .steps div { flex: 1; text-align: center; font-size: 12px; color: var(--muted); }
+  .steps div::before { content: ''; display: block; height: 5px; border-radius: 3px; background: var(--line); margin-bottom: 5px; }
+  .steps div.done { color: var(--teal); font-weight: 600; }
+  .steps div.done::before { background: var(--teal); }
+  .steps.cancelled div::before { background: #f0c2bd; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
+
+  /* Alerts */
+  .alert { display: flex; gap: 10px; align-items: baseline; padding: 8px 10px; border-left: 4px solid var(--amber); background: var(--amber-soft); border-radius: 6px; margin-bottom: 8px; font-size: 14px; }
+  .alert:last-child { margin-bottom: 0; }
+  .alert time { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+  /* Chat */
+  .chat-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chat-bar input { flex: 1; min-width: 90px; }
+  #chatBox { height: 260px; overflow-y: auto; background: var(--bg); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 14px; background: #fff; border: 1px solid var(--line); align-self: flex-start; }
+  .msg small { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+  .msg.me { align-self: flex-end; background: var(--teal); border-color: var(--teal); color: #fff; }
+  .msg.me small { color: #bfe7e2; }
+  .msg.sys { align-self: center; background: none; border: none; color: var(--muted); font-size: 12px; }
+  .send { display: flex; gap: 8px; margin-top: 12px; }
+  .send input { flex: 1; }
+
+  @media (max-width: 820px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Order Tracker & Live Support</h1>
+    <p>Place orders, track them live, and chat with support.</p>
+  </div>
+  <div id="conn"><i></i><span>Connecting...</span></div>
+</header>
+
+<main>
+  <div class="col">
+    <section>
+      <h2>Menu <span class="tag">REST</span></h2>
+      <div class="menu" id="menu"><div class="empty">Loading menu...</div></div>
+    </section>
+
+    <section>
+      <h2>Your orders <span class="tag">WebSocket + JSON-RPC</span></h2>
+      <div id="orders"></div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section>
+      <h2>Live support chat <span class="tag">WebSocket</span></h2>
+      <div class="chat-bar">
+        <select id="role" aria-label="Your role">
+          <option>Customer</option>
+          <option>Support</option>
+        </select>
+        <input id="room" value="room1" aria-label="Room name" />
+        <button class="primary" id="joinBtn">Join room</button>
+      </div>
+      <div id="chatBox"></div>
+      <div class="send">
+        <input id="msg" placeholder="Type a message" aria-label="Message" />
+        <button class="primary" id="sendBtn">Send</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>System alerts <span class="tag">SSE</span></h2>
+      <div id="alerts"><div class="empty">Waiting for alerts...</div></div>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+  // Change this to your Render URL after deploying the backend
+  const API_URL = 'http://localhost:3000';
+  const STEPS = ['Placed', 'Preparing', 'On the way', 'Delivered'];
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const socket = io(API_URL);
+  let orders = [];
+  let joined = false;
+
+  // ---------- Connection status ----------
+  socket.on('connect', () => { $('conn').className = 'on'; $('conn').querySelector('span').textContent = 'Live'; });
+  socket.on('disconnect', () => { $('conn').className = ''; $('conn').querySelector('span').textContent = 'Disconnected'; });
+
+  // ---------- REST: menu ----------
+  async function loadMenu() {
+    try {
+      const items = await (await fetch(API_URL + '/api/v1/catalog')).json();
+      $('menu').innerHTML = items.map((i) => `
+        <div class="dish"><b>${esc(i.name)}</b><span>Rs ${esc(i.price)}</span>
+          <button class="primary" data-item="${esc(i.name)}">Order now</button></div>`).join('');
+    } catch (e) {
+      $('menu').innerHTML = '<div class="empty">Could not load the menu. Check that the backend is running.</div>';
+    }
+  }
+  $('menu').addEventListener('click', (e) => {
+    const item = e.target.dataset.item;
+    if (item) placeOrder(item);
+  });
+
+  // ---------- REST: orders ----------
+  async function loadOrders() {
+    try { orders = await (await fetch(API_URL + '/api/v1/orders')).json(); } catch (e) { orders = []; }
+    renderOrders();
+  }
+  async function placeOrder(item) {
+    await fetch(API_URL + '/api/v1/orders', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item })
+    });
+  }
+  async function setStatus(id, status) {
+    await fetch(`${API_URL}/api/v1/orders/${id}/status`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status })
+    });
+  }
+
+  // ---------- JSON-RPC: cancelOrder ----------
+  async function cancelOrder(id) {
+    await fetch(API_URL + '/rpc', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', method: 'cancelOrder', params: { id }, id: Date.now() })
+    });
+  }
+
+  function renderOrders() {
+    if (!orders.length) { $('orders').innerHTML = '<div class="empty">No orders yet. Pick something from the menu.</div>'; return; }
+    $('orders').innerHTML = orders.slice().reverse().map((o) => {
+      const idx = STEPS.indexOf(o.status);
+      const cancelled = o.status === 'Cancelled';
+      const finished = cancelled || o.status === 'Delivered';
+      const next = STEPS[idx + 1];
+      return `
+      <div class="order">
+        <div class="order-top"><b>Order #${o.id}: ${esc(o.item)}</b>
+          <span class="badge b-${esc(o.status.replace(/\s/g, ''))}">${esc(o.status)}</span></div>
+        <div class="steps ${cancelled ? 'cancelled' : ''}">
+          ${STEPS.map((s, i) => `<div class="${!cancelled && i <= idx ? 'done' : ''}">${s}</div>`).join('')}
+        </div>
+        <div class="actions">
+          ${!finished && next ? `<button data-act="status" data-id="${o.id}" data-status="${next}">Mark as ${next}</button>` : ''}
+          ${!finished ? `<button class="danger" data-act="cancel" data-id="${o.id}">Cancel order</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  $('orders').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    const id = Number(b.dataset.id);
+    if (b.dataset.act === 'status') setStatus(id, b.dataset.status);
+    if (b.dataset.act === 'cancel') cancelOrder(id);
+  });
+
+  // ---------- WebSocket: live order events ----------
+  socket.on('order:new', (o) => { orders.push(o); renderOrders(); });
+  socket.on('order:status', (u) => { orders = orders.map((o) => (o.id === u.id ? u : o)); renderOrders(); });
+
+  // ---------- SSE: system alerts ----------
+  let firstAlert = true;
+  const es = new EventSource(API_URL + '/events');
+  es.onmessage = (e) => {
+    const d = JSON.parse(e.data);
+    if (firstAlert) { $('alerts').innerHTML = ''; firstAlert = false; }
+    const div = document.createElement('div');
+    div.className = 'alert';
+    div.innerHTML = `<span>${esc(d.alert)}</span><time>${new Date(d.time).toLocaleTimeString()}</time>`;
+    $('alerts').prepend(div);
+    while ($('alerts').children.length > 5) $('alerts').removeChild($('alerts').lastChild);
+  };
+
+  // ---------- WebSocket: chat ----------
+  function addChat(sender, text, kind) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (kind || '');
+    div.innerHTML = kind === 'sys' ? esc(text) : `<small>${esc(sender)}</small>${esc(text)}`;
+    $('chatBox').appendChild(div);
+    $('chatBox').scrollTop = $('chatBox').scrollHeight;
+  }
+  $('joinBtn').onclick = () => {
+    const room = $('room').value.trim();
+    if (!room) return;
+    socket.emit('chat:join', { room });
+    joined = true;
+    addChat('', `You joined ${room} as ${$('role').value}`, 'sys');
+  };
+  function sendMsg() {
+    const text = $('msg').value.trim();
+    if (!text) return;
+    if (!joined) { addChat('', 'Join a room first to send messages.', 'sys'); return; }
+    socket.emit('chat:message', { room: $('room').value.trim(), sender: $('role').value, text });
+    $('msg').value = '';
+  }
+  $('sendBtn').onclick = sendMsg;
+  $('msg').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMsg(); });
+  socket.on('chat:message', (m) => addChat(m.sender, m.text, m.sender === $('role').value ? 'me' : ''));
+
+  loadMenu();
+  loadOrders();
+</script>
+</body>
+</html>
