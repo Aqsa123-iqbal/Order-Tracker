@@ -130,29 +130,37 @@
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
-  // Change this to your Render URL after deploying the backend
-  const API_URL = 'http://localhost:3000';
+  // Railway deployment URL for backend (no trailing slash)
+  const API_URL = 'https://order-tracker-production-d639.up.railway.app';
   const STEPS = ['Placed', 'Preparing', 'On the way', 'Delivered'];
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  const socket = io(API_URL);
+  const socket = io(API_URL, { transports: ['websocket', 'polling'] });
   let orders = [];
   let joined = false;
 
   // ---------- Connection status ----------
-  socket.on('connect', () => { $('conn').className = 'on'; $('conn').querySelector('span').textContent = 'Live'; });
-  socket.on('disconnect', () => { $('conn').className = ''; $('conn').querySelector('span').textContent = 'Disconnected'; });
+  function setConn(isOn, text) {
+    $('conn').className = isOn ? 'on' : '';
+    $('conn').querySelector('span').textContent = text;
+  }
+  socket.on('connect', () => { setConn(true, 'Live'); loadOrders(); });
+  socket.on('disconnect', () => setConn(false, 'Disconnected'));
+  socket.on('connect_error', () => setConn(false, 'Cannot reach server'));
 
-  // ---------- REST: menu ----------
+  // ---------- REST: menu (retries every 3s until it loads) ----------
   async function loadMenu() {
     try {
-      const items = await (await fetch(API_URL + '/api/v1/catalog')).json();
+      const res = await fetch(API_URL + '/api/v1/catalog');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const items = await res.json();
       $('menu').innerHTML = items.map((i) => `
         <div class="dish"><b>${esc(i.name)}</b><span>Rs ${esc(i.price)}</span>
           <button class="primary" data-item="${esc(i.name)}">Order now</button></div>`).join('');
     } catch (e) {
-      $('menu').innerHTML = '<div class="empty">Could not load the menu. Check that the backend is running.</div>';
+      $('menu').innerHTML = '<div class="empty">Could not reach the server. Retrying...</div>';
+      setTimeout(loadMenu, 3000);
     }
   }
   $('menu').addEventListener('click', (e) => {
@@ -162,8 +170,14 @@
 
   // ---------- REST: orders ----------
   async function loadOrders() {
-    try { orders = await (await fetch(API_URL + '/api/v1/orders')).json(); } catch (e) { orders = []; }
-    renderOrders();
+    try {
+      const res = await fetch(API_URL + '/api/v1/orders');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      orders = await res.json();
+      renderOrders();
+    } catch (e) {
+      setTimeout(loadOrders, 3000);
+    }
   }
   async function placeOrder(item) {
     await fetch(API_URL + '/api/v1/orders', {
