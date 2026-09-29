@@ -17,6 +17,14 @@ const catalog = [
 ];
 let orders = [];
 
+// ---- Root Route ----
+app.get('/', (req, res) => {
+  res.json({
+    status: 'Order Tracker API is running',
+    endpoints: ['/api/v1/catalog', '/api/v1/orders', '/rpc', '/events']
+  });
+});
+
 // ---- 1. REST API ----
 app.get('/api/v1/catalog', (req, res) => res.json(catalog));
 app.get('/api/v1/orders', (req, res) => res.json(orders));
