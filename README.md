@@ -1,6 +1,6 @@
 # Real-Time Order Tracker & Live Support System
 
-CSC337 - Lab Assignment 04
+Web Development Lab #4
 
 A full-stack web application that demonstrates four communication protocols in one project: REST, WebSockets (Socket.io), JSON-RPC 2.0 and Server-Sent Events (SSE).
 
@@ -142,13 +142,42 @@ node server.js
 
 The server runs on `http://localhost:3000` (or the port in the `PORT` environment variable).
 
+## Testing Screenshots
+
+### API Root
+<img width="1919" height="959" alt="API running message" src="https://github.com/user-attachments/assets/14ab3b98-82a3-44c6-be8f-05c34f9bc63a" />
+
+### REST: Catalog
+<img width="1919" height="956" alt="catalog JSON" src="https://github.com/user-attachments/assets/ff2e18b9-c3cc-4773-a927-13dfd2e4aa8e" />
+
+### REST: Orders
+<img width="1920" height="964" alt="order" src="https://github.com/user-attachments/assets/531a1a1a-c9d7-4804-ab87-5250fa7522f6" />
+
+### SSE: Live Alerts
+<img width="1919" height="1012" alt="event alert" src="https://github.com/user-attachments/assets/087394d1-9af2-4d4c-a53d-f139e30bdcfc" />
+
 ### Frontend
+<img width="1920" height="967" alt="front" src="https://github.com/user-attachments/assets/3138a47a-d92a-43c3-b1ca-d6196e4ff7d0" />
 
-Open `frontend/index.html` in the browser (or use the VS Code Live Server extension). If you run the backend locally, change the backend URL inside `index.html` to `http://localhost:3000`.
+### Real-Time Order Update (WebSocket)
+<img width="1920" height="964" alt="order" src="https://github.com/user-attachments/assets/3ab5f9b4-0e71-48f7-b65e-c71ab1eb7ebe" />
 
-## Deployment
+### Live Chat (Customer and Support)
+<img width="1919" height="960" alt="customer" src="https://github.com/user-attachments/assets/fac2425c-b810-4540-ae25-4194d9691764" />
+<img width="1920" height="978" alt="support" src="https://github.com/user-attachments/assets/5bafb2c5-c636-4c58-b2ec-f2da486fc69b" />
 
-- **Backend:** deployed on Railway from the `backend` folder. Start command: `node server.js`.
-- **Frontend:** deployed on Netlify from the `frontend` folder.
+### Create Order (REST POST)
+<img width="1919" height="960" alt="customer" src="https://github.com/user-attachments/assets/7806a14f-d74f-476d-8e8a-a6bb67c4cdcb" />
+
+### JSON-RPC cancelOrder
+<img width="1919" height="960" alt="customer" src="https://github.com/user-attachments/assets/7806a14f-d74f-476d-8e8a-a6bb67c4cdcb" />
+
+
+
+
+
+
+
+
 
 
